@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compound Interest Calculator</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 400px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        input {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        button {
+            background-color: #4299e1;
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #3182ce;
+        }
+
+        .results {
+            margin-top: 3rem;
+        }
+
+        h2 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-table {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .results-table th:last-child,
+        .results-table td:last-child {
+            text-align: right;
+            padding-right: 2rem;
+        }
+
+        .results-table th:first-child,
+        .results-table td:first-child {
+            padding-left: 2rem;
+            width: 30%;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .results-table tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .results-table th {
+            background-color: #4299e1;
+            color: white;
+            font-weight: 500;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Remove the old results-grid styles */
+        .results-grid,
+        .result-card,
+        .year,
+        .amount {
+            display: none;
+        }
+
+        body {
+            background-color: #f7fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        input::placeholder {
+            color: #a0aec0;
+            opacity: 1;
+        }
+
+        .advanced-toggle {
+            color: #4299e1;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            user-select: none;
+        }
+
+        .advanced-toggle:hover {
+            color: #3182ce;
+        }
+
+        .arrow {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .advanced-options {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            gap: 1.5rem;
+            display: none;
+            flex-direction: column;
+        }
+
+        .advanced-options.show {
+            display: flex;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: white;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Compound Interest Calculator</h1>
+        <div class="input-group">
+            <div class="input-field">
+                <label for="principal">Initial Amount ($)</label>
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        id="principal"
+                        placeholder="e.g., $5,000"
+                        oninput="formatCurrency(this)"
+                    />
+                </div>
+            </div>
+            <div class="input-field">
+                <label for="rate">Annual Interest Rate (%)</label>
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        id="rate"
+                        placeholder="e.g., 8%"
+                        oninput="formatRate(this)"
+                    />
+                </div>
+            </div>
+
+            <div class="advanced-toggle" onclick="toggleAdvanced()">
+                <span>Advanced Options</span>
+                <span class="arrow">▼</span>
+            </div>
+
+            <div class="advanced-options" id="advancedOptions">
+                <div class="input-field">
+                    <label for="contribution">Additional Contribution ($)</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="contribution"
+                            placeholder="e.g., $500"
+                            oninput="formatCurrency(this)"
+                        />
+                    </div>
+                </div>
+                <div class="input-field">
+                    <label for="frequency">Contribution Frequency</label>
+                    <select id="frequency">
+                        <option value="12">Monthly</option>
+                        <option value="2">Semi-Annually</option>
+                        <option value="1">Annually</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="calculateCompoundInterest()">Calculate</button>
+        </div>
+        <div id="results" class="results" style="display: none;">
+            <h2>Results</h2>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="results-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(input) {
+            // Remove all characters except numbers
+            let value = input.value.replace(/[^\d]/g, '');
+            
+            // Convert to number and format with commas
+            if (value) {
+                value = parseInt(value);
+                input.value = '$' + value.toLocaleString('en-US');
+            } else {
+                input.value = '';
+            }
+        }
+
+        function formatRate(input) {
+            // Remove all characters except numbers and decimal point
+            let value = input.value.replace(/[^\d.]/g, '');
+            
+            // Ensure only one decimal point
+            let parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            // Limit to 2 decimal places
+            if (parts.length > 1) {
+                value = parts[0] + '.' + parts[1].slice(0, 2);
+            }
+
+            input.value = value ? value + '%' : '';
+        }
+
+        function toggleAdvanced() {
+            const advancedOptions = document.getElementById('advancedOptions');
+            const arrow = document.querySelector('.arrow');
+            advancedOptions.classList.toggle('show');
+            arrow.classList.toggle('open');
+        }
+
+        function calculateCompoundInterest() {
+            const principalStr = document.getElementById('principal').value.replace(/[$,]/g, '');
+            const rateStr = document.getElementById('rate').value.replace('%', '');
+            const contributionStr = document.getElementById('contribution').value.replace(/[$,]/g, '') || '0';
+            const frequency = parseInt(document.getElementById('frequency').value) || 12;
+            
+            const principal = parseFloat(principalStr);
+            const rate = parseFloat(rateStr) / 100;
+            const contribution = parseFloat(contributionStr);
+            
+            const resultsDiv = document.getElementById('results');
+            const resultsBody = document.getElementById('results-tbody');
+
+            if (isNaN(principal) || isNaN(rate)) {
+                alert('Please enter valid numbers for both fields');
+                return;
+            }
+
+            resultsBody.innerHTML = '';
+            const yearsToShow = [1, 2, 3, 4, 5, 10, 20, 30];
+
+            yearsToShow.forEach(year => {
+                let amount = principal * Math.pow(1 + rate, year);
+                
+                // Add contributions if they exist
+                if (contribution > 0) {
+                    // Calculate future value of regular contributions
+                    const ratePerPeriod = rate / frequency;
+                    const periods = year * frequency;
+                    const contributionFV = contribution * ((Math.pow(1 + ratePerPeriod, periods) - 1) / ratePerPeriod);
+                    amount += contributionFV;
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Year ${year}</td>
+                    <td>$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                `;
+                resultsBody.appendChild(row);
+            });
+
+            resultsDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html> 
